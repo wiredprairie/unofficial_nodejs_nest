@@ -1,0 +1,22 @@
+{
+    "name":"unofficial-nest-api",
+    "description":"A simple API for accessing the very unofficial Nest thermostat APIs",
+    "author": {
+        "name":"Aaron",
+        "email":"npm@wiredprairie.us",
+        "url":"http://www.wiredprairie.us"
+    },
+    "main" : "lib/index.js",
+    "license":"BSD",
+    "repository":{
+        "type":"git",
+        "url":"https://github.com/wiredprairie/unofficial_nodejs_nest.git"
+    },
+    "version":"0.1",
+    "private":false,
+    "dependencies":{
+    },
+    "engines": {
+        "node": "*"
+    }
+}
