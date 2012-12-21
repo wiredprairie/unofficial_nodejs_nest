@@ -12,8 +12,10 @@ To use it as is:
 
 * Install Node from http://nodejs.org
 * Install the unofficial Nest Thermostat API:
+
     npm install unofficial-nest-api
 * Run:
+    
     node app.js 'NESTUSERNAME' 'NESTPASSWORD'
 
 To set the temperature, you'll need to login, and fetch the status once before calling the setTemperature function:
