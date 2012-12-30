@@ -67,6 +67,8 @@ if (username && password) {
                 }
             }
             subscribe();
+            //nest.setAway();
+            //nest.setHome();
         });
     });
 }

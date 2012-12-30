@@ -38,6 +38,18 @@ To set the temperature, you'll need to login, and fetch the status once before c
         });
     });
 
+The example above sets the temperature of every thermostat in current structure to 70F.
+
 Also, note that the subscribe function may not return results frequently. It's based on the data coming from your
 thermostats, which may not change frequently. There's a default 60 second timeout. The callback is always called,
 which then gives your code an opportunity to call subscribe again.
+
+There are a handful of provided functions:
+
+* `setTemperature(thermostatID, temperature)`
+* `setAway(structureID [optional, default = first structure], away [optional, default=true])`
+* `setHome(structureID [optional, default = first structure])`
+* `ctof` => Celsius to Fahrenheit
+* `ftoc` => Fahrenheit to Celsius
+* `getStructureId` => returns the first structure Id found
+* `getStructureIds` => returns all structure Ids, as an array

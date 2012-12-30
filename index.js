@@ -135,7 +135,7 @@
                 response.on('data', function (data) {
                     allData.push(data);
                 });
-                response.on('error', function() {
+                response.on('error', function () {
                     if (done) {
                         done(null, response.headers || {});
                     }
@@ -216,8 +216,8 @@
         });
     };
 
-    function pushKeys(keys, node, idnode) {
-        idnode = idnode || node;         // might be the same thing ...
+    function pushKeys(keys, node, idNode) {
+        idNode = idNode || node;         // might be the same thing ...
 
         var lastStatus = nestExports.lastStatus;
         var src;
@@ -225,14 +225,14 @@
         var timestamp = 0;
         // loop through a master list (that always has all keys)
         // but we might find data stored more specifically for a single key
-        for (var id in lastStatus[idnode]) {
+        for (var id in lastStatus[idNode]) {
             src = version = timestamp = 0;
             if (lastStatus[node] && lastStatus[node].hasOwnProperty(id)) {
                 src = node;
                 version = lastStatus[node][id]['$version'];
                 timestamp = lastStatus[src][id]['$timestamp'] || toUtc().getTime();
-            } else if (lastStatus[idnode] && lastStatus[idnode].hasOwnProperty(id)) {
-                src = idnode;
+            } else if (lastStatus[idNode] && lastStatus[idNode].hasOwnProperty(id)) {
+                src = idNode;
             }
             if (src) {
                 keys.push({
@@ -244,6 +244,9 @@
         }
     }
 
+    // returns current date/time as UTC (or UTC of passed value)
+    // to convert to a nest friendly time, use .getTime() on the return
+    // value.
     function toUtc(now) {
         now = now || new Date();
         var now_utc = new Date(now.getUTCFullYear(),
@@ -258,9 +261,8 @@
     }
 
     var subscribe = function (done, types) {
-        if (!nestExports.lastStatus) {
-            throw new Error("Must call fetchStatus to initialize.");
-        }
+        validateStatus();
+
         // always have something ...
         types = types || ['shared'];
         var body = {};
@@ -340,7 +342,8 @@
 
     };
 
-    var setTemperature = function (thermostatID, tempC) {
+    var setTemperature = function (thermostatId, tempC) {
+        validateStatus();
 
         // likely passed in a F temp, so just convert it.
         if (tempC > 45) {
@@ -354,12 +357,12 @@
 
         body = JSON.stringify(body);
         var headers = {
-            'X-nl-base-version':nestExports.lastStatus['shared'][thermostatID]['$version'],
+            'X-nl-base-version':nestExports.lastStatus['shared'][thermostatId]['$version'],
             'Content-Type':'application/json'
         };
 
         nestPost({
-            path:'/v2/put/shared.' + thermostatID,
+            path:'/v2/put/shared.' + thermostatId,
             body:body,
             headers:headers,
             done:function (data) {
@@ -368,6 +371,41 @@
         });
     };
 
+    var setAway = function (away, structureId) {
+        validateStatus();
+
+        structureId = structureId || getFirstStructureId();
+        if (!structureId) {
+            throw new Error('Missing required structureId');
+        }
+
+        away = typeof away === 'undefined' ? true : away; // default to Away
+
+        var body = {
+            'away_timestamp':toUtc().getTime(),
+            'away':away,
+            'away_setter':0
+        };
+
+        body = JSON.stringify(body);
+        var headers = {
+            'X-nl-base-version':nestExports.lastStatus['structure'][structureId]['$version'],
+            'Content-Type':'application/json'
+        };
+
+        nestPost({
+            path:'/v2/put/structure.' + structureId,
+            body:body,
+            headers:headers,
+            done:function (data) {
+                console.log('Set away to ' + away);
+            }
+        });
+    };
+
+    var setHome = function (structureId) {
+        setAway(false, structureId);
+    };
 
     var fahrenheitToCelsius = function (f) {
         return (f - 32) * 5 / 9.0;
@@ -388,16 +426,53 @@
         return o1;
     }
 
+    function validateStatus() {
+        if (!nestExports.lastStatus) {
+            throw new Error("Must call fetchStatus to initialize.");
+        }
+    }
+
+    // this just gets the first structure id, nothing fancy
+    var getFirstStructureId = function () {
+        validateStatus();
+
+        var allIds = getStructureIds();
+        if (!allIds || allIds.length === 0) {
+            return null;
+        }
+
+        return allIds[0];
+    };
+
+    var getStructureIds = function () {
+        validateStatus();
+        var structures = nestExports.lastStatus.structure;
+
+        var allIds = [];
+        for (var id in structures) {
+            if (structures.hasOwnProperty(id)) {
+                allIds.push(id);
+            }
+        }
+
+        return allIds;
+
+    };
+
     // exported function list
     var nestExports = {
         'login':login,
         'setTemperature':setTemperature,
+        'setAway':setAway,
+        'setHome':setHome,
         'fetchStatus':fetchCurrentStatus,
         'subscribe':subscribe,
         'get':nestGet,
         'post':nestPost,
         'ftoc':fahrenheitToCelsius,
-        'ctof':celsiusToFahrenheit
+        'ctof':celsiusToFahrenheit,
+        'getStructureId':getFirstStructureId(),
+        'getStructureIds':getStructureIds()
     };
 
     nestExports.userAgent = defaultNestUserAgent;
