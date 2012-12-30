@@ -471,8 +471,8 @@
         'post':nestPost,
         'ftoc':fahrenheitToCelsius,
         'ctof':celsiusToFahrenheit,
-        'getStructureId':getFirstStructureId(),
-        'getStructureIds':getStructureIds()
+        'getStructureId':getFirstStructureId,
+        'getStructureIds':getStructureIds
     };
 
     nestExports.userAgent = defaultNestUserAgent;
