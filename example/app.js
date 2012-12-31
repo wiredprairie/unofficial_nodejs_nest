@@ -8,7 +8,7 @@
 "option strict";
 var
     util = require('util'),
-    nest = require('unofficial-nest-api');
+    nest = require('../index.js');  // normally would be 'unofficial-nest-api'
 
 
 function trimQuotes(s) {
