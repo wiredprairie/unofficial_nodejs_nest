@@ -31,6 +31,11 @@
     var nestSession = {};
     var defaultNestUserAgent = 'Nest/3.0.15 (iOS) os=6.0 platform=iPad3,1';
 
+    var fanModes = {
+        'auto': 'auto',
+        'on': 'on'
+    };
+
 
     /* always call login first. :)  */
     var login = function (username, password, done) {
@@ -407,6 +412,41 @@
         setAway(false, structureId);
     };
 
+    var setFanMode = function (deviceId, fanMode) {
+        validateStatus();
+
+        deviceId = deviceId || getFirstDeviceId();
+        if (!deviceId) {
+            throw new Error('Missing required deviceId');
+        }
+
+        if (! (fanMode in fanModes)) {
+            throw new Error('Invalid fanMode: ' + fanMode);
+        }
+
+        var body = JSON.stringify({
+            'fan_mode': fanMode
+        });
+
+        var postData = {
+            path:'/v2/put/device.' + deviceId,
+            body:body,
+            done:function (data) {
+                console.log('Set fan mode to ' + fanMode);
+            }
+        };
+
+        nestPost(postData);
+    };
+
+    var setFanModeOn = function (deviceId) {
+        setFanMode(deviceId, fanModes.on);
+    }
+
+    var setFanModeAuto = function (deviceId) {
+        setFanMode(deviceId, fanModes.auto);
+    };
+
     var fahrenheitToCelsius = function (f) {
         return (f - 32) * 5 / 9.0;
     };
@@ -459,12 +499,39 @@
 
     };
 
+    var getFirstDeviceId = function () {
+        validateStatus();
+
+        var allIds = getDeviceIds();
+        if (!allIds || allIds.length === 0) {
+            return null;
+        }
+
+        return allIds[0];
+    };
+
+    var getDeviceIds = function () {
+        validateStatus();
+        var devices = nestExports.lastStatus.device;
+
+        var allIds = [];
+        for (var id in devices) {
+            if (devices.hasOwnProperty(id)) {
+                allIds.push(id);
+            }
+        }
+
+        return allIds;
+    }
+
     // exported function list
     var nestExports = {
         'login':login,
         'setTemperature':setTemperature,
         'setAway':setAway,
         'setHome':setHome,
+        'setFanModeOn':setFanModeOn,
+        'setFanModeAuto':setFanModeAuto,
         'fetchStatus':fetchCurrentStatus,
         'subscribe':subscribe,
         'get':nestGet,
