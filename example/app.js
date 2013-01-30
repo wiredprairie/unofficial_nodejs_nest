@@ -66,7 +66,11 @@ if (username && password) {
                         nest.ctof(device.target_temperature)));
                 }
             }
-            subscribe();
+            //var ids = nest.getDeviceIds();
+            //nest.setTemperature(ids[0], 70);
+            //nest.setTemperature(70);
+            //nest.setFanModeAuto();
+            //subscribe();
             //nest.setAway();
             //nest.setHome();
         });

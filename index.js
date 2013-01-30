@@ -349,8 +349,21 @@
 
     };
 
-    var setTemperature = function (thermostatId, tempC) {
+    // if first parameter is not a deviceId, treats
+    // it like a temperature, and sets the temperature
+    // using that value (and then uses the first thermostat
+    // found in your structure
+    //      setTemperature(temp)
+    //          equiv to setTemperature(getFirstDeviceId(), temp)
+    var setTemperature = function (deviceId, tempC) {
         validateStatus();
+
+        if (typeof tempC === 'undefined') {
+            if (!isDeviceId(deviceId)) {
+                deviceId = getFirstDeviceId();
+                tempC = deviceId;
+            }
+        }
 
         // likely passed in a F temp, so just convert it.
         if (tempC > 45) {
@@ -364,12 +377,12 @@
 
         body = JSON.stringify(body);
         var headers = {
-            'X-nl-base-version':nestExports.lastStatus['shared'][thermostatId]['$version'],
+            'X-nl-base-version':nestExports.lastStatus['shared'][deviceId]['$version'],
             'Content-Type':'application/json'
         };
 
         nestPost({
-            path:'/v2/put/shared.' + thermostatId,
+            path:'/v2/put/shared.' + deviceId,
             body:body,
             headers:headers,
             done:function (data) {
@@ -443,7 +456,7 @@
 
     var setFanModeOn = function (deviceId) {
         setFanMode(deviceId, fanModes.on);
-    }
+    };
 
     var setFanModeAuto = function (deviceId) {
         setFanMode(deviceId, fanModes.auto);
@@ -524,6 +537,10 @@
         }
 
         return allIds;
+    };
+
+    function isDeviceId(deviceId) {
+        return getDeviceIds().indexOf(deviceId) > -1;
     }
 
     // exported function list
@@ -541,7 +558,8 @@
         'ftoc':fahrenheitToCelsius,
         'ctof':celsiusToFahrenheit,
         'getStructureId':getFirstStructureId,
-        'getStructureIds':getStructureIds
+        'getStructureIds':getStructureIds,
+        'getDeviceIds':getDeviceIds
     };
 
     nestExports.userAgent = defaultNestUserAgent;

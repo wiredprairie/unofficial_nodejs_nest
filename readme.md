@@ -47,9 +47,13 @@ which then gives your code an opportunity to call subscribe again.
 There are a handful of provided functions:
 
 * `setTemperature(thermostatID, temperature)`
+* `setTemperature(temperature)` => defaults to first device (only use this if you have one thermostat)
 * `setAway(structureID [optional, default = first structure], away [optional, default=true])`
 * `setHome(structureID [optional, default = first structure])`
+* `setFanModeAuto(deviceID [optional, default = first device])`
+* `setFanModeOn(deviceID [optional, default = first device])`
 * `ctof` => Celsius to Fahrenheit
 * `ftoc` => Fahrenheit to Celsius
 * `getStructureId` => returns the first structure Id found
 * `getStructureIds` => returns all structure Ids, as an array
+* `getDeviceIds` => returns all device Ids, as an array
