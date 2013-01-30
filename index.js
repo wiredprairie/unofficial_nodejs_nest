@@ -319,7 +319,9 @@
                 },
                 done:function (data, headers) {
                     if (!data || !headers) {
+                        // nothing to do apparently ....
                         done();
+                        return;
                     }
                     var device = headers['x-nl-skv-key'];
                     var timestamp = headers['x-nl-skv-timestamp'] || toUtc().getTime();
