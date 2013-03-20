@@ -38,26 +38,34 @@
 
 
     /* always call login first. :)  */
+    /**
+     * Login to the Nest thermostat.
+     * @param {String} username Your Nest user name.
+     * @param {String} password Your nest password.
+     * @param {Function} done Callback to be called when login is complete.
+     */
     var login = function (username, password, done) {
         nestPost({
-                hostname:'home.nest.com',
-                port:443,
-                path:'/user/login',
-                body:{'username':username, 'password':password},
-                done:function (data) {
-                    // internal and external
-                    nestSession = data;
-                    nestExports.session = data;
-                    nestSession.urls.transport_url = url.parse(nestSession.urls.transport_url);
+          hostname: 'home.nest.com',
+          port: 443,
+          path:'/user/login',
+          body: { 'username': username, 'password': password },
+          done: function(data) {
+              if (data.error) {
+                  if (typeof done === 'function') {
+                      done(new Error(data.error_description), null);
+                  }
+              } else {
+                  nestSession = data;
+                  nestExports.session = data;
+                  nestSession.urls.transport_url = url.parse(nestSession.urls.transport_url);
 
-                    if (done) {
-                        done(data);
-                    }
-
-                }
-            }
-        )
-        ;
+                  if (typeof done === 'function') {
+                      done(null, data);
+                  }
+              }
+          }
+      });
     };
 
     // Post data to Nest.
