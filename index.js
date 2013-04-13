@@ -36,6 +36,12 @@
         'on': 'on'
     };
 
+    var temperatureTypes = {
+      'cool' : 'cool',
+      'heat' : 'heat',
+      'range' : 'range'
+    };
+
 
     /* always call login first. :)  */
     var login = function (username, password, done) {
@@ -462,6 +468,44 @@
         setFanMode(deviceId, fanModes.auto);
     };
 
+    var setTargetTemperatureType = function(deviceId, tempType) {
+        validateStatus();
+
+        deviceId = deviceId || getFirstDeviceId();
+        if (!deviceId) {
+            throw new Error('Missing required deviceId');
+        }
+
+        if (! (tempType in temperatureTypes)) {
+            throw new Error('Invalid temperature type: ' + tempType);
+        }
+
+        var body = JSON.stringify({
+            'target_temperature_type': tempType
+        });
+
+        var headers = {
+            'X-nl-base-version':nestExports.lastStatus['shared'][deviceId]['$version'],
+            'Content-Type':'application/json'
+        };
+
+        var postData = {
+            path:'/v2/put/shared.' + deviceId,
+            headers: headers,
+            body: body,
+            done: function(data) {
+                console.log('Set temperature mode to  ' + tempType);
+            },
+            error: function(res, error) {
+                console.log('Error setting temperature mode to  ' + tempType);
+                console.log(error);
+            }
+
+        };
+
+        nestPost(postData);
+    };
+
     var fahrenheitToCelsius = function (f) {
         return (f - 32) * 5 / 9.0;
     };
@@ -551,6 +595,7 @@
         'setHome':setHome,
         'setFanModeOn':setFanModeOn,
         'setFanModeAuto':setFanModeAuto,
+        'setTargetTemperatureType':setTargetTemperatureType,
         'fetchStatus':fetchCurrentStatus,
         'subscribe':subscribe,
         'get':nestGet,

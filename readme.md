@@ -1,10 +1,9 @@
 Unofficial Nest API on Node
 ===========================
 
-This is a very unofficial demonstration of the API used by Nest Thermostats to communicate back to the Nest Lab web
-servers.
+This is a **very unofficial** demonstration of the API used by Nest Thermostats.
 
-For more information about the API and communication check [here](http://www.wiredprairie.us/blog/index.php/archives/1754).
+For more information about the unofficial API and communication check [here](http://www.wiredprairie.us/blog/index.php/archives/1754).
 
 The file, app.js included demonstrates one way to use the API.
 
@@ -52,6 +51,7 @@ There are a handful of provided functions:
 * `setHome(structureID [optional, default = first structure])`
 * `setFanModeAuto(deviceID [optional, default = first device])`
 * `setFanModeOn(deviceID [optional, default = first device])`
+* `setTargetTemperatureType(deviceID [optional, default = first device], temperatureType ['cool','heat','range'])`
 * `ctof` => Celsius to Fahrenheit
 * `ftoc` => Fahrenheit to Celsius
 * `getStructureId` => returns the first structure Id found
