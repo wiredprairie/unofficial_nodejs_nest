@@ -20,9 +20,9 @@ To use it as is:
 
 To set the temperature, you'll need to login, and fetch the status once before calling the setTemperature function:
 
-    nest.login(username, password, function (data) {
-        if (!data) {
-            console.log('Login failed.');
+    nest.login(username, password, function (err, data) {
+        if (err) {
+            console.log(err.message);
             process.exit(1);
             return;
         }

@@ -6,8 +6,7 @@
  */
 
 "option strict";
-var
-    util = require('util'),
+var util = require('util'),
     nest = require('../index.js');  // normally would be 'unofficial-nest-api'
 
 
@@ -49,9 +48,9 @@ var password = process.argv[3];
 if (username && password) {
     username = trimQuotes(username);
     password = trimQuotes(password);
-    nest.login(username, password, function (data) {
-        if (!data) {
-            console.log('Login failed.');
+    nest.login(username, password, function (err, data) {
+        if (err) {
+            console.log(err.message);
             process.exit(1);
             return;
         }
