@@ -612,7 +612,7 @@
         'ctof':celsiusToFahrenheit,
         'getStructureId':getFirstStructureId,
         'getStructureIds':getStructureIds,
-        'getDeviceIds':getDeviceIds
+        'getDeviceIds':getDeviceIds,
         'logger': { error   : function(msg, props) { console.log(msg); console.trace(props.exception); }
                   , warning : function(msg, props) { console.log(msg); if (props) console.log(props);  }
                   , notice  : function(msg, props) { console.log(msg); if (props) console.log(props);  }
