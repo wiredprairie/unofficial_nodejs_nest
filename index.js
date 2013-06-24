@@ -200,6 +200,13 @@
                 response.on('data', function (data) {
                     allData.push(data);
                 });
+                response.on('error', function (err) {
+                   console.log('Error setting fetching information');
+                   console.log(err);
+                    if (done) {
+                        done(null);
+                    }
+                });
                 response.on('end', function () {
                     // convert all data
                     allData = allData.join('');
