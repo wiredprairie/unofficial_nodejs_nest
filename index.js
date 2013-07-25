@@ -514,6 +514,58 @@
         nestPost(postData);
     };
 
+    /*
+     * Function: setDualFuelBreakpoint
+     * Description: sets the dual fuel breakpoint regarding when
+     *   to use alt heat, primary heat, or neither.
+     * Arguments:
+     *   deviceId: the deviceId to set, or null (which means first)
+     *   breakpoint: either:
+     *     A number in fahrenheit; or
+     *     A string either 'always-primary' or 'always-alt'
+     */
+    var setDualFuelBreakpoint = function(deviceId, breakpoint) {
+        validateStatus();
+
+        deviceId = deviceId || getFirstDeviceId();
+        if (!deviceId) {
+            throw new Error('Missing required deviceId');
+        }
+
+        var body;
+        if (typeof breakpoint !== 'string') {
+            breakpoint = fahrenheitToCelsius(breakpoint);
+            body = JSON.stringify({
+                'dual_fuel_breakpoint_override':'none',
+                'dual_fuel_breakpoint':breakpoint
+            });
+        } else {
+            body = JSON.stringify({
+               'dual_fuel_breakpoint_override':breakpoint
+            });
+        }
+
+        var headers = {
+            'X-nl-base-version':nestExports.lastStatus['shared'][deviceId]['$version'],
+            'Content-Type':'application/json'
+        };
+
+        var postData = {
+            path:'/v2/put/device.' + deviceId,
+            headers: headers,
+            body: body,
+            done: function(data) {
+                console.log('Set dual fuel break point mode to ' + breakpoint);
+            },
+            error: function(res, error) {
+                console.log('Error setting dual fuel break point mode to ' + breakpoint);
+                console.log(error);
+            }
+        };
+
+        nestPost(postData);
+    }
+
     var fahrenheitToCelsius = function (f) {
         return (f - 32) * 5 / 9.0;
     };
@@ -604,6 +656,7 @@
         'setFanModeOn':setFanModeOn,
         'setFanModeAuto':setFanModeAuto,
         'setTargetTemperatureType':setTargetTemperatureType,
+        'setDualFuelBreakpoint':setDualFuelBreakpoint,
         'fetchStatus':fetchCurrentStatus,
         'subscribe':subscribe,
         'get':nestGet,
@@ -626,5 +679,4 @@
     } else {
         root.nest = nestExports;
     }
-
 })();
