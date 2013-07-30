@@ -57,7 +57,9 @@
           path:'/user/login',
           body: { 'username': username, 'password': password },
           done: function(data) {
-              if (data.error) {
+              if (!data) {
+                  if (typeof done === 'function') return done(new Error('parse error'), null);
+              } else if (data.error) {
                   if (typeof done === 'function') {
                       done(new Error(data.error_description), null);
                   }
@@ -162,8 +164,13 @@
                 response.on('end', function () {
                     // convert all data
                     allData = allData.join('');
-                    if (allData && typeof allData === 'string') {
-                        allData = JSON.parse(allData);
+                    if (allData && typeof allData === 'string' && allData.length > 0) {
+                        try { allData = JSON.parse(allData); } catch(ex) {
+                            nestExports.logger.error('Error parsing JSON', { exception: ex });
+                            allData = null;
+                        }
+                    } else {
+                        allData = null;
                     }
                     if (done) {
                         done(allData, response.headers || {});
@@ -201,8 +208,7 @@
                     allData.push(data);
                 });
                 response.on('error', function (err) {
-                   console.log('Error setting fetching information');
-                   console.log(err);
+                   nestExports.logger.error('Error setting fetching information', { exception: err });
                     if (done) {
                         done(null);
                     }
@@ -212,7 +218,10 @@
                     allData = allData.join('');
 
                     if (allData && typeof allData === 'string' && allData.length > 0) {
-                        allData = JSON.parse(allData);
+                        try { allData = JSON.parse(allData); } catch(ex) {
+                            nestExports.logger.error('Error parsing JSON', { exception: ex });
+                            allData = null;
+                        }
                     } else {
                         allData = null;
                     }
@@ -228,8 +237,7 @@
     var fetchCurrentStatus = function (done) {
         nestGet('/v2/mobile/' + nestSession.user, function (data) {
             if (!data) {
-                console.log('unable to retrieve status');
-                return;
+                return nestExports.logger.error('Error to retrieve status');
             }
 
             nestExports.lastStatus = data;
@@ -407,7 +415,7 @@
             body:body,
             headers:headers,
             done:function (data) {
-                console.log('Set temperature');
+                nestExports.logger.debug('Set temperature');
             }
         });
     };
@@ -439,7 +447,7 @@
             body:body,
             headers:headers,
             done:function (data) {
-                console.log('Set away to ' + away);
+                nestExports.logger.debug('Set away to ' + away);
             }
         });
     };
@@ -468,7 +476,7 @@
             path:'/v2/put/device.' + deviceId,
             body:body,
             done:function (data) {
-                console.log('Set fan mode to ' + fanMode);
+                nestExports.logger.debug('Set fan mode to ' + fanMode);
             }
         };
 
@@ -509,11 +517,10 @@
             headers: headers,
             body: body,
             done: function(data) {
-                console.log('Set temperature mode to  ' + tempType);
+                nestExports.logger.debug('Set temperature mode to  ' + tempType);
             },
             error: function(res, error) {
-                console.log('Error setting temperature mode to  ' + tempType);
-                console.log(error);
+                nestExports.logger.error('Error setting temperature mode to  ' + tempType, { exception: error });
             }
 
         };
