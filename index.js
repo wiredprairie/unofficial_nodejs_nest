@@ -39,6 +39,7 @@
     var temperatureTypes = {
       'cool' : 'cool',
       'heat' : 'heat',
+      'off': 'off',
       'range' : 'range'
     };
 
