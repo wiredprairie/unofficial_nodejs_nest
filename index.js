@@ -641,6 +641,7 @@
     var nestExports = {
         'login':login,
         'setTemperature':setTemperature,
+        'setTemperatureRange':setTemperatureRange,
         'setAway':setAway,
         'setHome':setHome,
         'setFanModeOn':setFanModeOn,
