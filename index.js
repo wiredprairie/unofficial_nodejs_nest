@@ -406,6 +406,47 @@
         });
     };
 
+    var setTemperatureRange = function (deviceId, tempCLow, tempCHigh) {
+        validateStatus();
+
+        if (typeof tempCHigh === 'undefined') {
+            if (!isDeviceId(deviceId)) {
+                tempCHigh = tempCLow;
+                tempCLow = deviceId;
+                deviceId = getFirstDeviceId();
+            }
+        }
+
+        // likely passed in a F temp, so just convert it.
+        if (tempCLow > 45) {
+            tempCLow = fahrenheitToCelsius(tempCLow);
+        }
+        if (tempCHigh > 45) {
+            tempCHigh = fahrenheitToCelsius(tempCHigh);
+        }
+
+        var body = {
+            'target_change_pending':true,
+            'target_temperature_low':tempCLow,
+            'target_temperature_high':tempCHigh
+        };
+
+        body = JSON.stringify(body);
+        var headers = {
+            'X-nl-base-version':nestExports.lastStatus['shared'][deviceId]['$version'],
+            'Content-Type':'application/json'
+        };
+
+        nestPost({
+            path:'/v2/put/shared.' + deviceId,
+            body:body,
+            headers:headers,
+            done:function (data) {
+                console.log('Set temperature range');
+            }
+        });
+    };
+
     var setAway = function (away, structureId) {
         validateStatus();
 
@@ -600,6 +641,7 @@
     var nestExports = {
         'login':login,
         'setTemperature':setTemperature,
+        'setTemperatureRange':setTemperatureRange,
         'setAway':setAway,
         'setHome':setHome,
         'setFanModeOn':setFanModeOn,
