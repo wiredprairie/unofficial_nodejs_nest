@@ -390,8 +390,8 @@
 
         if (typeof tempC === 'undefined') {
             if (!isDeviceId(deviceId)) {
-                deviceId = getFirstDeviceId();
                 tempC = deviceId;
+                deviceId = getFirstDeviceId();
             }
         }
 
